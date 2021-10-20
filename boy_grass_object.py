@@ -17,6 +17,7 @@ class character:
         self.state = 5
         self.dir = 0
         self.dr = 1
+
     def update(self):
         self.x += self.dir * 10
         self.frame = (self.frame+1) % 3
@@ -28,6 +29,7 @@ class character:
             self.y += self.j
         else:
             self.j = -20
+
     def draw(self):
         if self.dr == 1 and self.dir != 0 and self.j == -20:
             self.image.clip_draw(self.frame * 60 + 480, self.state * 64, 64, 60, self.x, self.y)
@@ -43,23 +45,28 @@ class character:
             self.image.clip_draw(60, self.state * 64, 64, 60, self.x, self.y)
 
 
-# class enemy:
-#     def __init__(self):
-#         self.image = load_image('enemies.png')
-#         self.x, self.y = 600, 80
-#         self.frame = 0
-#         self.dir = 1
-#
-#     def update(self):
-#         self.x += self.dir * 5
-#         self.frame = (self.frame + 1) % 2
-#
-#     def draw(self):
-#         if self.dr == 1 and self.dir != 0 and self.j == -20:
-#             self.image.clip_draw(self.frame * 60 + 480, self.state * 64, 64, 60, self.x, self.y)
-#         elif self.dr == -1 and self.dir != 0 and self.j == -20:
-#             self.image.clip_draw(self.frame * -60 + 300, self.state * 64, 64, 60, self.x, self.y)
+class enemy:
+    def __init__(self):
+        self.image = load_image('enemies.png')
+        self.x, self.y = 600, 80-2
+        self.frame = 0
+        self.count = 0
+        self.dir = 1
 
+    def update(self):
+        if 0 < self.count <= 20:
+            self.x += self.dir * 5
+            self.count += 1
+        elif self.count <= 0:
+            self.x -= self.dir * 5
+            self.count += 1
+        else:
+            self.count = -20
+            self.dir = -self.dir
+        self.frame = (self.frame + 1) % 2
+
+    def draw(self):
+        self.image.clip_draw(self.frame * 60, 480, 60, 60, self.x, self.y)
 
 def handle_events():
     global running
@@ -93,6 +100,7 @@ open_canvas(1000, 500)
 
 bg =bg()
 character = character()
+enemy = enemy()
 
 running = True
 
@@ -103,13 +111,14 @@ while running:
 
     #Game logic
     character.update()
+    enemy.update()
 
     #Game drawing
     clear_canvas()
 
     bg.draw()
     character.draw()
-
+    enemy.draw()
     update_canvas()
 
     delay(0.05)
