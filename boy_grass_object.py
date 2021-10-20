@@ -19,8 +19,12 @@ class character:
         self.dr = 1
 
     def update(self):
-        self.x += self.dir * 10
-        self.frame = (self.frame+1) % 3
+        if self.frame != 5:
+            self.x += self.dir * 10
+            self.frame = (self.frame + 1) % 3
+        else:
+            self.y -= 5
+            self.frame = 5
         if self.j > 0:
             self.y += self.j
             self.j -= 1
@@ -31,7 +35,9 @@ class character:
             self.j = -15
 
     def draw(self):
-        if self.dr == 1 and self.dir != 0 and self.j == -15:
+        if self.frame == 5:
+            self.image.clip_draw(780, self.state * 66, 64, 66, self.x, self.y)
+        elif self.dr == 1 and self.dir != 0 and self.j == -15:
             self.image.clip_draw(self.frame * 60 + 480, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr == -1 and self.dir != 0 and self.j == -15:
             self.image.clip_draw(self.frame * -60 + 300, self.state * 66, 64, 66, self.x, self.y)
@@ -66,8 +72,15 @@ class enemy:
             self.count = -20
             self.dir = -self.dir
         if character.x <= self.x + 15 and character.x >= self.x - 15:
-            if character.y <= self.y + 15 and character.y >= self.y - 15:
+            if character.y >= self.y + 20 and character.y <= self.y + 40:
                 self.dir = 0
+            else:
+                if character.state != 5:
+                    character.state += 2
+
+                else:
+                    character.frame = 5
+
         self.frame = (self.frame + 1) % 2
 
     def draw(self):
@@ -84,9 +97,23 @@ class item:
     def update(self):
         if character.x <= self.x + 15 and character.x >= self.x - 15:
             if character.y <= self.y + 15 and character.y >= self.y - 15:
-                self.m = 10
-                self.n = 10
+                self.x = -25
+                self.y = -25
                 character.state = 3
+        elif self.x == -25 and self.y == -25:
+            self.x = -50
+            self.y = -50
+            character.state = 5
+        elif self.x == -50 and self.y == -50:
+            self.x = -75
+            self.y = -75
+            character.state = 3
+        elif self.x == -75 and self.y == -75:
+            self.x = -100
+            self.y = -100
+            character.state = 5
+        elif self.x == -100 and self.y == -100:
+            character.state = 3
     def draw(self):
         self.image.clip_draw(self.m * 60, self.n * 60, 60, 60, self.x, self.y)
 
@@ -132,17 +159,17 @@ while running:
     handle_events()
 
     #Game logic
+    mush.update()
     character.update()
     enemy.update()
-    mush.update()
 
     #Game drawing
     clear_canvas()
 
     bg.draw()
-    enemy.draw()
     mush.draw()
     character.draw()
+    enemy.draw()
 
     update_canvas()
 
