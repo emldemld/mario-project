@@ -11,7 +11,7 @@ class bg:
 class character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
-        self.x, self.y = 400, 80
+        self.x, self.y = 400, 90
         self.j = -15
         self.frame = 0
         self.state = 5
@@ -32,17 +32,17 @@ class character:
 
     def draw(self):
         if self.dr == 1 and self.dir != 0 and self.j == -15:
-            self.image.clip_draw(self.frame * 60 + 480, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(self.frame * 60 + 480, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr == -1 and self.dir != 0 and self.j == -15:
-            self.image.clip_draw(self.frame * -60 + 300, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(self.frame * -60 + 300, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr == 1 and self.dir == 0 and self.j == -15:
-            self.image.clip_draw(420, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(420, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr == -1 and self.dir == 0 and self.j == -15:
-            self.image.clip_draw(360, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(360, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr == 1 and self.j != -15:
-            self.image.clip_draw(720, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(720, self.state * 66, 64, 66, self.x, self.y)
         elif self.dr != 1 and self.j != -15:
-            self.image.clip_draw(60, self.state * 64, 64, 60, self.x, self.y)
+            self.image.clip_draw(60, self.state * 66, 64, 66, self.x, self.y)
 
 class enemy:
     def __init__(self):
@@ -76,8 +76,8 @@ class item:
         self.x, self.y = 300, 80
         self.m, self.n = m, n
     def update(self):
-        if character.x < self.x + 10 and character.x > self.x - 10:
-            if character.y < self.y + 10 and character.y > self.y - 10:
+        if character.x <= self.x + 15 and character.x >= self.x - 15:
+            if character.y <= self.y + 15 and character.y >= self.y - 15:
                 self.m = 10
                 self.n = 10
                 character.state = 3
