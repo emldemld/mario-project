@@ -55,6 +55,7 @@ class enemy:
         self.image = load_image('enemies.png')
         self.x, self.y = 600, 80-2
         self.frame = 0
+        self.n = 0
         self.count = 0
         self.dir = 1
 
@@ -75,11 +76,10 @@ class enemy:
             if character.y >= self.y + 20 and character.y <= self.y + 40:
                 self.dir = 0
             else:
-                if character.state != 5:
-                    character.state += 2
-
-                else:
+                if character.state == 5:
                     character.frame = 5
+                else:
+                    character.state += 2
 
         self.frame = (self.frame + 1) % 2
 
@@ -160,16 +160,16 @@ while running:
 
     #Game logic
     mush.update()
-    character.update()
     enemy.update()
+    character.update()
 
     #Game drawing
     clear_canvas()
 
     bg.draw()
     mush.draw()
-    character.draw()
     enemy.draw()
+    character.draw()
 
     update_canvas()
 
