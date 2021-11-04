@@ -3,6 +3,9 @@ import game_framework
 import object
 import stage
 
+# Game object class here
+
+
 def handle_events():
     global running
     events = get_events()

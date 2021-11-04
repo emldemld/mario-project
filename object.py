@@ -1,7 +1,5 @@
 from pico2d import *
 
-# Game object class here
-
 class character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
@@ -71,4 +69,43 @@ class item:
             character.state = 3
     def draw(self):
         self.image.clip_draw(self.m * 60, self.n * 60, 60, 60, self.x, self.y)
+
+class enemy:
+    def __init__(self):
+        self.image = load_image('enemies.png')
+        self.x, self.y = 600, 80-2
+        self.frame = 0
+        self.n = 0
+        self.count = 0
+        self.dir = 1
+
+    def update(self):
+        if 0 < self.count <= 20 and self.dir != 0:
+            self.x += self.dir * 5
+            self.count += 1
+        elif self.count <= 0 and self.dir != 0:
+            self.x -= self.dir * 5
+            self.count += 1
+        elif self.dir == 0:
+            self.x = -100
+            self.y = -100
+        else:
+            self.count = -20
+            self.dir = -self.dir
+        if character.x <= self.x + 15 and character.x >= self.x - 15:
+            if character.y >= self.y + 20 and character.y <= self.y + 40:
+                self.dir = 0
+            else:
+                if character.state == 5:
+                    character.frame = 5
+                else:
+                    character.state += 2
+
+        self.frame = (self.frame + 1) % 2
+
+    def draw(self):
+        if self.dir != 0:
+            self.image.clip_draw(self.frame * 60, 480, 60, 60, self.x, self.y)
+        else:
+            self.image.clip_draw(120, 480, 60, 60, self.x, self.y - 10)
 
