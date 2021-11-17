@@ -4,28 +4,16 @@ import main_state
 
 name = "TitleState"
 image = None
-logo_time = 0.0
+
 
 def enter():
     global image
-    image = load_image('title.jpg')
+    image = load_image('img.png')
+
 
 def exit():
     global image
-    del(image)
-
-def update():
-    global logo_time
-    if (logo_time > 1.0):
-        logo_time = 0
-        game_framework.quit()
-    delay(0.01)
-    logo_time += 0.01
-
-def draw():
-    clear_canvas()
-    image.draw(500, 300)
-    update_canvas()
+    del (image)
 
 
 def handle_events():
@@ -39,11 +27,27 @@ def handle_events():
             elif (event.type, event.key) == (SDL_KEYDOWN, SDLK_SPACE):
                 game_framework.change_state(main_state)
 
+def draw():
+    clear_canvas()
+    image.draw(500, 375)
+    update_canvas()
 
-def pause(): pass
 
 
-def resume(): pass
+
+
+def update():
+    pass
+
+
+def pause():
+    pass
+
+
+def resume():
+    pass
+
+
 
 
 
