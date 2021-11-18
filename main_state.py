@@ -6,26 +6,28 @@ from pico2d import *
 import game_framework
 import game_world
 
-from boy import Boy
-from grass import Grass
-from ball import Ball
+from character import Character
+from stage import Stage
+from object import *
 
 
 name = "MainState"
 
-boy = None
-grass = None
+character = None
+stage = None
+enemy = None
 
 def enter():
-    global boy, grass
-    boy = Boy()
-    grass = Grass()
-
+    global character, stage, enemy
+    character = Character()
+    stage = Stage()
+    enemy = Enemy()
 
 def exit():
-    global boy, grass
-    del boy
-    del grass
+    global character, stage
+    del character
+    del stage
+    del enemy
 
 def pause():
     pass
@@ -43,17 +45,19 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
         else:
-            boy.handle_event(event)
-
+            character.handle_event(event)
 
 def update():
-    boy.update()
+    character.update()
+    #enemy.update()
+    delay(0.02)
 
 
 def draw():
     clear_canvas()
-    grass.draw()
-    boy.draw()
+    stage.draw()
+    character.draw()
+    enemy.draw()
     update_canvas()
 
 

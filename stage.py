@@ -1,6 +1,7 @@
 from pico2d import *
+from object import *
 
-class bg:
+class Stage:
     def __init__(self): #생성자
         self.image = load_image('bg-1-1.png')
     def draw(self):
