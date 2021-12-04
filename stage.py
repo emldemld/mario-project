@@ -1,5 +1,4 @@
 from pico2d import *
-from object import *
 
 class Stage:
     def __init__(self): #생성자

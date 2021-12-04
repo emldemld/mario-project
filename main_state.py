@@ -9,25 +9,20 @@ import game_world
 from character import Character
 from stage import Stage
 from object import *
-
+import server
 
 name = "MainState"
 
-character = None
-stage = None
-enemy = None
-
 def enter():
-    global character, stage, enemy
-    character = Character()
-    stage = Stage()
-    enemy = Enemy()
+    server.character = Character()
+    game_world.add_object(server.character, 1)
+    server.stage = Stage()
+    game_world.add_object(server.stage, 0)
+    server.enemy = Enemy()
+    game_world.add_object(server.enemy, 1)
 
 def exit():
-    global character, stage
-    del character
-    del stage
-    del enemy
+    game_world.clear()
 
 def pause():
     pass
@@ -45,19 +40,17 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
                 game_framework.quit()
         else:
-            character.handle_event(event)
+            server.character.handle_event(event)
 
 def update():
-    character.update()
-    #enemy.update()
-    delay(0.02)
+    for game_object in game_world.all_objects():
+        game_object.update()
 
 
 def draw():
     clear_canvas()
-    stage.draw()
-    character.draw()
-    enemy.draw()
+    for game_object in game_world.all_objects():
+        game_object.draw()
     update_canvas()
 
 
