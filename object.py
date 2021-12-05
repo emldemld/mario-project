@@ -1,5 +1,6 @@
 from pico2d import *
 from character import Character
+import game_world
 
 class item:
     def __init__(self, m, n): #생성자
@@ -68,3 +69,20 @@ class Enemy:
             self.image.clip_draw(self.frame * 60, 480, 60, 60, self.x, self.y)
         else:
             self.image.clip_draw(120, 480, 60, 60, self.x, self.y - 10)
+
+class Ball:
+    image = None
+
+    def __init__(self, x=400, y=300, velocity=1):
+        if self.image == None:
+            self.image = load_image('enemies.png')
+        self.x, self.y, self.velocity = x, y, velocity
+
+    def draw(self):
+         self.image.clip_draw(720, 120, 60, 60, self.x, self.y)
+
+    def update(self):
+        self.x += self.velocity
+
+        if self.x < 25 or self.x > 750 - 25:
+            game_world.remove_object(self)
