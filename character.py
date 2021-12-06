@@ -16,14 +16,15 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 8
 
-RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SPACE, SHIFT, MUSHROOM, DAMAGE = range(8)
+RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SPACE_DOWN, SPACE_UP, SHIFT, MUSHROOM, DAMAGE = range(9)
 
 key_event_table = {
     (SDL_KEYDOWN, SDLK_d): RIGHT_DOWN,
     (SDL_KEYDOWN, SDLK_a): LEFT_DOWN,
     (SDL_KEYUP, SDLK_d): RIGHT_UP,
     (SDL_KEYUP, SDLK_a): LEFT_UP,
-    (SDL_KEYDOWN, SDLK_SPACE): SPACE,
+    (SDL_KEYDOWN, SDLK_SPACE): SPACE_DOWN,
+    (SDL_KEYUP, SDLK_SPACE): SPACE_UP,
     (SDL_KEYDOWN, SDLK_LSHIFT): SHIFT
 }
 
@@ -37,22 +38,36 @@ class SmallIdleState:
             character.velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
             character.velocity += RUN_SPEED_PPS
+        elif event == SPACE_UP:
+            if character.j != -10:
+                character.j = -character.j
+        elif event == SPACE_DOWN:
+            character.j = 10
         elif event == DAMAGE:
             pass
 
     def exit(character, event):
-        if event == SPACE:
-            pass
-
-    def do(character):
         pass
 
+    def do(character):
+        if character.j > 0:
+            character.y += character.j
+            character.j -= 0.25
+        elif character.j <= 0 and character.j > -10:
+            character.j -= 0.25
+            character.y += character.j
+        else:
+            character.j = -10
     def draw(character):
         cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
 
-        if character.dir == 1:
+        if character.j > -10 and character.dir == 1:
+            character.image.clip_draw(720, 5 * 66, 64, 66, cx, cy)
+        elif character.j > -10 and character.dir == -1:
+            character.image.clip_draw(60, 5 * 66, 64, 66, cx, cy)
+        elif character.j == -10 and character.dir == 1:
             character.image.clip_draw(420, 5 * 66, 64, 66, cx, cy)
-        else:
+        elif character.j == -10 and character.dir == -1:
             character.image.clip_draw(360, 5 * 66, 64, 66, cx, cy)
 
 
@@ -66,22 +81,38 @@ class SmallRunState:
             character.velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
             character.velocity += RUN_SPEED_PPS
+        elif event == SPACE_UP:
+            if character.j != -10:
+                character.j = -character.j
+        elif event == SPACE_DOWN:
+            character.j = 10
         character.dir = clamp(-1, character.velocity, 1)
 
     def exit(character, event):
-        if event == SPACE:
-            pass
+        pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3 + 1
+        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
         character.x += character.velocity * game_framework.frame_time
-        character.x = clamp(25, character.x, 750 - 25)
-        character.y = clamp(90, character.y, server.stage.h - 90)
+        if character.j > 0:
+            character.y += character.j
+            character.j -= 0.25
+        elif character.j <= 0 and character.j > -10:
+            character.j -= 0.25
+            character.y += character.j
+        else:
+            character.j = -10
+        #character.x = clamp(25, character.x, 750 - 25)
+        #character.y = clamp(90, character.y, server.stage.h - 90)
 
     def draw(character):
         cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
 
-        if character.dir == 1:
+        if character.j > -10 and character.dir == 1:
+            character.image.clip_draw(720, 5 * 66, 64, 66, cx, cy)
+        elif character.j > -10 and character.dir == -1:
+            character.image.clip_draw(60, 5 * 66, 64, 66, cx, cy)
+        elif character.j == -10 and character.dir == 1:
             character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 5, 64, 66, cx, cy)
         else:
             character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 5, 64, 66, cx, cy)
@@ -97,20 +128,35 @@ class BigIdleState:
             character.velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
             character.velocity += RUN_SPEED_PPS
+        elif event == SPACE_UP:
+            if character.j != -10:
+                character.j = -character.j
+        elif event == SPACE_DOWN:
+            character.j = 10
         elif event == DAMAGE:
             pass
 
     def exit(character, event):
-        if event == SPACE:
-            pass
-
-    def do(character):
         pass
 
-    def draw(character):
-        cx, cy = character.x - server.background.window_left, character.y - server.background.window_bottom
+    def do(character):
+        if character.j > 0:
+            character.y += character.j
+            character.j -= 0.25
+        elif character.j <= 0 and character.j > -10:
+            character.j -= 0.25
+            character.y += character.j
+        else:
+            character.j = -10
 
-        if character.dir == 1:
+    def draw(character):
+        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
+
+        if character.j > -10 and character.dir == 1:
+            character.image.clip_draw(720, 3 * 66, 64, 66, cx, cy)
+        elif character.j > -10 and character.dir == -1:
+            character.image.clip_draw(60, 3 * 66, 64, 66, cx, cy)
+        elif character.j == -10 and character.dir == 1:
             character.image.clip_draw(420, 3 * 66, 64, 66, cx, cy)
         else:
             character.image.clip_draw(360, 3 * 66, 64, 66, cx, cy)
@@ -126,44 +172,58 @@ class BigRunState:
             character.velocity -= RUN_SPEED_PPS
         elif event == LEFT_UP:
             character.velocity += RUN_SPEED_PPS
+        elif event == SPACE_UP:
+            if character.j != -10:
+                character.j = -character.j
+        elif event == SPACE_DOWN:
+            character.j = 10
         character.dir = clamp(-1, character.velocity, 1)
 
     def exit(character, event):
-        if event == SPACE:
-            pass
+        pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3 + 1
+        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
         character.x += character.velocity * game_framework.frame_time
-        character.x = clamp(25, character.x, 750 - 25)
-        character.y = clamp(90, character.y, server.background.h - 90)
+        if character.j > 0:
+            character.y += character.j
+            character.j -= 0.25
+        elif character.j <= 0 and character.j > -10:
+            character.j -= 0.25
+            character.y += character.j
+        else:
+            character.j = -10
+        #character.x = clamp(25, character.x, 750 - 25)
+        #character.y = clamp(90, character.y, server.background.h - 90)
 
     def draw(character):
-        cx, cy = character.x - server.background.window_left, character.y - server.background.window_bottom
+        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
 
-        if character.dir == 1:
-            character.image.clip_draw(character.frame * 60 + 480, 66 * 5, 64, 66, cx, cy)
+        if character.j > -10 and character.dir == 1:
+            character.image.clip_draw(720, 3 * 66, 64, 66, cx, cy)
+        elif character.j > -10 and character.dir == -1:
+            character.image.clip_draw(60, 3 * 66, 64, 66, cx, cy)
+        elif character.j == -10 and character.dir == 1:
+            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 3, 64, 66, cx, cy)
         else:
-            character.image.clip_draw(character.frame * -60 + 300, 66 * 5, 64, 66, cx, cy)
-
+            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 3, 64, 66, cx, cy)
 
 next_state_table = {
     SmallIdleState: {RIGHT_UP: SmallRunState, LEFT_UP: SmallRunState, RIGHT_DOWN: SmallRunState, LEFT_DOWN: SmallRunState,
-                     SPACE: SmallIdleState, SHIFT: SmallIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
+                     SPACE_UP: SmallIdleState, SPACE_DOWN: SmallIdleState, SHIFT: SmallIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
     SmallRunState: {RIGHT_UP: SmallIdleState, LEFT_UP: SmallIdleState, LEFT_DOWN: SmallIdleState, RIGHT_DOWN: SmallIdleState,
-                    SPACE: SmallRunState, SHIFT: SmallRunState, MUSHROOM: BigRunState, DAMAGE: SmallIdleState},
+                    SPACE_UP: SmallRunState, SPACE_DOWN: SmallRunState, SHIFT: SmallRunState, MUSHROOM: BigRunState, DAMAGE: SmallIdleState},
     BigIdleState: {RIGHT_UP: BigRunState, LEFT_UP: BigRunState, RIGHT_DOWN: BigRunState, LEFT_DOWN: BigRunState,
-                    SPACE: BigIdleState, SHIFT: BigIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
+                    SPACE_UP: BigIdleState, SPACE_DOWN: BigIdleState, SHIFT: BigIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
     BigRunState: {RIGHT_UP: BigIdleState, LEFT_UP: BigIdleState, LEFT_DOWN: BigIdleState, RIGHT_DOWN: BigIdleState,
-                    SPACE: BigRunState, SHIFT: BigRunState, MUSHROOM: BigRunState, DAMAGE: SmallRunState},
+                    SPACE_UP: BigRunState, SPACE_DOWN: BigRunState, SHIFT: BigRunState, MUSHROOM: BigRunState, DAMAGE: SmallRunState},
 }
 
 class Character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
-        self.x = 400
-        self.y = 90
-        self.j = -15
+        self.x, self.y = 300, 88
+        self.j = -10
         self.frame = 0
         self.dir = 1
         self.velocity = 0
@@ -172,7 +232,9 @@ class Character:
         self.cur_state.enter(self, None)
 
     def get_bb(self):
-        return self.x - 50, self.y - 50, self.x + 50, self.y + 50
+        cx, cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
+
+        return cx - 25, self.y - 35, cx + 25, self.y + 35
 
 
     def fire_ball(self):
