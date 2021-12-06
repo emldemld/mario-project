@@ -19,10 +19,10 @@ FRAMES_PER_ACTION = 8
 RIGHT_DOWN, LEFT_DOWN, RIGHT_UP, LEFT_UP, SPACE, SHIFT, MUSHROOM, DAMAGE = range(8)
 
 key_event_table = {
-    (SDL_KEYDOWN, SDLK_a): RIGHT_DOWN,
-    (SDL_KEYDOWN, SDLK_d): LEFT_DOWN,
-    (SDL_KEYUP, SDLK_a): RIGHT_UP,
-    (SDL_KEYUP, SDLK_d): LEFT_UP,
+    (SDL_KEYDOWN, SDLK_d): RIGHT_DOWN,
+    (SDL_KEYDOWN, SDLK_a): LEFT_DOWN,
+    (SDL_KEYUP, SDLK_d): RIGHT_UP,
+    (SDL_KEYUP, SDLK_a): LEFT_UP,
     (SDL_KEYDOWN, SDLK_SPACE): SPACE,
     (SDL_KEYDOWN, SDLK_LSHIFT): SHIFT
 }
@@ -45,13 +45,15 @@ class SmallIdleState:
             pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        pass
 
     def draw(character):
+        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
+
         if character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 100, 300, 100, 100, character.x, character.y)
+            character.image.clip_draw(420, 5 * 66, 64, 66, cx, cy)
         else:
-            character.image.clip_draw(int(character.frame) * 100, 200, 100, 100, character.x, character.y)
+            character.image.clip_draw(360, 5 * 66, 64, 66, cx, cy)
 
 
 class SmallRunState:
@@ -71,15 +73,18 @@ class SmallRunState:
             pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3 + 1
         character.x += character.velocity * game_framework.frame_time
-        character.x = clamp(25, character.x, 1600 - 25)
+        character.x = clamp(25, character.x, 750 - 25)
+        character.y = clamp(90, character.y, server.stage.h - 90)
 
     def draw(character):
+        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
+
         if character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 100, 100, 100, 100, character.x, character.y)
+            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 5, 64, 66, cx, cy)
         else:
-            character.image.clip_draw(int(character.frame) * 100, 0, 100, 100, character.x, character.y)
+            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 5, 64, 66, cx, cy)
 
 
 class BigIdleState:
@@ -100,13 +105,15 @@ class BigIdleState:
             pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        pass
 
     def draw(character):
+        cx, cy = character.x - server.background.window_left, character.y - server.background.window_bottom
+
         if character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 100, 300, 100, 100, character.x, character.y)
+            character.image.clip_draw(420, 3 * 66, 64, 66, cx, cy)
         else:
-            character.image.clip_draw(int(character.frame) * 100, 200, 100, 100, character.x, character.y)
+            character.image.clip_draw(360, 3 * 66, 64, 66, cx, cy)
 
 
 class BigRunState:
@@ -126,24 +133,27 @@ class BigRunState:
             pass
 
     def do(character):
-        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 8
+        character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3 + 1
         character.x += character.velocity * game_framework.frame_time
-        character.x = clamp(25, character.x, 1600 - 25)
+        character.x = clamp(25, character.x, 750 - 25)
+        character.y = clamp(90, character.y, server.background.h - 90)
 
     def draw(character):
+        cx, cy = character.x - server.background.window_left, character.y - server.background.window_bottom
+
         if character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 100, 100, 100, 100, character.x, character.y)
+            character.image.clip_draw(character.frame * 60 + 480, 66 * 5, 64, 66, cx, cy)
         else:
-            character.image.clip_draw(int(character.frame) * 100, 0, 100, 100, character.x, character.y)
+            character.image.clip_draw(character.frame * -60 + 300, 66 * 5, 64, 66, cx, cy)
 
 
 next_state_table = {
     SmallIdleState: {RIGHT_UP: SmallRunState, LEFT_UP: SmallRunState, RIGHT_DOWN: SmallRunState, LEFT_DOWN: SmallRunState,
-                     SPACE: SmallRunState, SHIFT: SmallIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
+                     SPACE: SmallIdleState, SHIFT: SmallIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
     SmallRunState: {RIGHT_UP: SmallIdleState, LEFT_UP: SmallIdleState, LEFT_DOWN: SmallIdleState, RIGHT_DOWN: SmallIdleState,
                     SPACE: SmallRunState, SHIFT: SmallRunState, MUSHROOM: BigRunState, DAMAGE: SmallIdleState},
-    BigIdleState: {RIGHT_UP: SmallRunState, LEFT_UP: SmallRunState, RIGHT_DOWN: SmallRunState, LEFT_DOWN: SmallRunState,
-                     SPACE: SmallRunState, SHIFT: SmallIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
+    BigIdleState: {RIGHT_UP: BigRunState, LEFT_UP: BigRunState, RIGHT_DOWN: BigRunState, LEFT_DOWN: BigRunState,
+                    SPACE: BigIdleState, SHIFT: BigIdleState, MUSHROOM: BigIdleState, DAMAGE: SmallIdleState},
     BigRunState: {RIGHT_UP: BigIdleState, LEFT_UP: BigIdleState, LEFT_DOWN: BigIdleState, RIGHT_DOWN: BigIdleState,
                     SPACE: BigRunState, SHIFT: BigRunState, MUSHROOM: BigRunState, DAMAGE: SmallRunState},
 }

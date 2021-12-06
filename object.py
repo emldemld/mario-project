@@ -1,5 +1,4 @@
 from pico2d import *
-from character import Character
 import game_world
 
 class item:

@@ -7,7 +7,7 @@ import game_framework
 import game_world
 
 from character import Character
-from stage import Stage
+from stage import Background
 from object import *
 import server
 
@@ -16,10 +16,10 @@ name = "MainState"
 def enter():
     server.character = Character()
     game_world.add_object(server.character, 1)
-    server.stage = Stage()
+    server.stage = Background()
     game_world.add_object(server.stage, 0)
-    server.enemy = Enemy()
-    game_world.add_object(server.enemy, 1)
+    #server.enemy = Enemy()
+    #game_world.add_object(server.enemy, 1)
 
 def exit():
     game_world.clear()
