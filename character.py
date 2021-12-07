@@ -25,7 +25,8 @@ key_event_table = {
     (SDL_KEYUP, SDLK_a): LEFT_UP,
     (SDL_KEYDOWN, SDLK_SPACE): SPACE_DOWN,
     (SDL_KEYUP, SDLK_SPACE): SPACE_UP,
-    (SDL_KEYDOWN, SDLK_LSHIFT): SHIFT
+    (SDL_KEYDOWN, SDLK_LSHIFT): SHIFT,
+    (SDL_KEYDOWN, SDLK_RSHIFT): DAMAGE
 }
 
 class SmallIdleState:
@@ -44,7 +45,8 @@ class SmallIdleState:
         elif event == SPACE_DOWN:
             character.j = 10
         elif event == DAMAGE:
-            pass
+            character.frame = 5
+            character.j = 10
 
     def exit(character, event):
         pass
@@ -56,12 +58,16 @@ class SmallIdleState:
         elif character.j <= 0 and character.j > -10:
             character.j -= 0.25
             character.y += character.j
+        elif character.j <= -10 and character.frame == 5:
+            character.y += character.j
         else:
             character.j = -10
     def draw(character):
-        if character.j > -10 and character.dir == 1:
+        if character.frame == 5:
+            character.image.clip_draw(780, 5 * 66, 64, 66, character.cx, character.cy)
+        elif character.j > -10 and character.dir == 1 and character.frame != 5:
             character.image.clip_draw(720, 5 * 66, 64, 66, character.cx, character.cy)
-        elif character.j > -10 and character.dir == -1:
+        elif character.j > -10 and character.dir == -1 and character.frame != 5:
             character.image.clip_draw(60, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == 1:
             character.image.clip_draw(420, 5 * 66, 64, 66, character.cx, character.cy)

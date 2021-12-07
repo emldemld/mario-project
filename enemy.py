@@ -21,7 +21,7 @@ FRAMES_PER_ACTION = 10
 class Enemy:
 
     def __init__(self):
-        self.x, self.y = random.randint(500, 6500), 95
+        self.x, self.y = random.randint(500, 5500), 95
         self.cx, self.cy = self.x, self.y
         self.image = load_image('enemies.png')
         self.font = load_font('ENCR10B.TTF', 16)
@@ -35,10 +35,10 @@ class Enemy:
 
 
     def wander(self):
-        self.speed = RUN_SPEED_PPS
+        self.speed = RUN_SPEED_MPM
         self.timer -= game_framework.frame_time
         if self.timer <= 0:
-            self.timer = 5.0
+            self.timer = 1.0
             self.dir = -self.dir
             return BehaviorTree.SUCCESS
         else:
@@ -56,8 +56,8 @@ class Enemy:
 
 
     def find_player(self):
-        distance = server.character.cx - self.cx ** 2
-        if distance < (PIXEL_PER_METER / 100) ** 2:
+        distance = (server.character.x - self.x) ** 2
+        if distance < (PIXEL_PER_METER * 14) ** 2:
             return BehaviorTree.SUCCESS
         else:
             self.speed = 0
@@ -80,7 +80,7 @@ class Enemy:
         chase_node = SequenceNode("Chase")
         chase_node.add_children(find_player_node, move_to_player_node)
         wander_chase_node = SelectorNode("WanderChase")
-        wander_chase_node.add_children(wander_node, chase_node)
+        wander_chase_node.add_children(chase_node, wander_node)
         self.bt = BehaviorTree(wander_chase_node)
 
 
