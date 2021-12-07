@@ -59,16 +59,14 @@ class SmallIdleState:
         else:
             character.j = -10
     def draw(character):
-        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
-
         if character.j > -10 and character.dir == 1:
-            character.image.clip_draw(720, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(720, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j > -10 and character.dir == -1:
-            character.image.clip_draw(60, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(60, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == 1:
-            character.image.clip_draw(420, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(420, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == -1:
-            character.image.clip_draw(360, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(360, 5 * 66, 64, 66, character.cx, character.cy)
 
 
 class SmallRunState:
@@ -102,20 +100,18 @@ class SmallRunState:
             character.y += character.j
         else:
             character.j = -10
-        #character.x = clamp(25, character.x, 750 - 25)
+        character.x = clamp(25, character.x, 5952 - 25)
         #character.y = clamp(90, character.y, server.stage.h - 90)
 
     def draw(character):
-        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
-
         if character.j > -10 and character.dir == 1:
-            character.image.clip_draw(720, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(720, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j > -10 and character.dir == -1:
-            character.image.clip_draw(60, 5 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(60, 5 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 5, 64, 66, cx, cy)
+            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 5, 64, 66, character.cx, character.cy)
         else:
-            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 5, 64, 66, cx, cy)
+            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 5, 64, 66, character.cx, character.cy)
 
 
 class BigIdleState:
@@ -193,7 +189,7 @@ class BigRunState:
             character.y += character.j
         else:
             character.j = -10
-        #character.x = clamp(25, character.x, 750 - 25)
+        character.x = clamp(25, character.x, 5952 - 25)
         #character.y = clamp(90, character.y, server.background.h - 90)
 
     def draw(character):
@@ -222,7 +218,9 @@ next_state_table = {
 class Character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
+        self.font = load_font('ENCR10B.TTF', 16)
         self.x, self.y = 300, 110
+        self.cx, self.y = 300, 110
         self.j = -10
         self.frame = 0
         self.dir = 1
@@ -232,9 +230,7 @@ class Character:
         self.cur_state.enter(self, None)
 
     def get_bb(self):
-        cx, cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
-
-        return cx - 25, self.y - 35, cx + 25, self.y + 35
+        return self.cx - 25, self.y - 35, self.cx + 25, self.y + 35
 
 
     def fire_ball(self):
@@ -246,6 +242,7 @@ class Character:
         self.event_que.insert(0, event)
 
     def update(self):
+        self.cx, self.cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()
@@ -256,7 +253,9 @@ class Character:
     def draw(self):
         self.cur_state.draw(self)
         draw_rectangle(*self.get_bb())
-        #fill here
+        #self.font.draw(self.cx - 60, self.y + 50, '(x: %3.2f)' % self.x, (255, 255, 0))
+        #self.font.draw(self.cx - 60, self.y + 75, '(cx: %3.2f)' % self.cx, (255, 255, 0))
+
 
     def handle_event(self, event):
         if (event.type, event.key) in key_event_table:

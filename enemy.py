@@ -1,7 +1,6 @@
 import random
-import math
 import game_framework
-from BehaviorTree import BehaviorTree, SelectorNode, SequenceNode, LeafNode
+from BT import BehaviorTree, SelectorNode, SequenceNode, LeafNode
 from pico2d import *
 
 import server
@@ -19,37 +18,19 @@ ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 10
 
 
-animation_names = ['Attack', 'Dead', 'Idle', 'Walk']
-
-
-class Zombie:
-    images = None
-
-    def load_images(self):
-        if Zombie.images == None:
-            Zombie.images = {}
-            for name in animation_names:
-                Zombie.images[name] = [load_image("./zombiefiles/female/"+ name + " (%d)" % i + ".png") for i in range(1, 11)]
-
-
-    def prepare_patrol_points(self):
-        # positions for origin at top, left
-        positions = [(43, 750), (1118, 750), (1050, 530), (575, 220), (235, 33), (575, 220), (1050, 530), (1118, 750)]
-        self.patrol_positions = []
-        for p in positions:
-            self.patrol_positions.append((p[0], 1024 - p[1]))  # convert for origin at bottom, left
-
+class Enemy:
 
     def __init__(self):
-        self.x, self.y = 1280 / 4 * 3, 1024 / 4 * 3
-        self.load_images()
-        self.dir = (random.random() % 2 + 1) * 90 # random moving direction
+        self.x, self.y = random.randint(500, 6500), 95
+        self.cx, self.cy = self.x, self.y
+        self.image = load_image('enemies.png')
+        self.font = load_font('ENCR10B.TTF', 16)
+        self.dir = random.random() % 3 - 1
         self.speed = 0
-        self.timer = 1.0  # change direction every 1 sec when wandering
+        self.timer = 2.0  # change direction every 1 sec when wandering
         self.wait_timer = 2.0
         self.frame = 0
         self.build_behavior_tree()
-
 
 
 
@@ -57,8 +38,8 @@ class Zombie:
         self.speed = RUN_SPEED_PPS
         self.timer -= game_framework.frame_time
         if self.timer <= 0:
-            self.timer = 1.0
-            self.dir = random.random() * 2 * math.pi
+            self.timer = 5.0
+            self.dir = -self.dir
             return BehaviorTree.SUCCESS
         else:
             return BehaviorTree.RUNNING
@@ -75,8 +56,8 @@ class Zombie:
 
 
     def find_player(self):
-        distance = (server.boy.x - self.x) ** 2 + (server.boy.y - self.y) ** 2
-        if distance < (PIXEL_PER_METER * 10) ** 2:
+        distance = server.character.cx - self.cx ** 2
+        if distance < (PIXEL_PER_METER / 100) ** 2:
             return BehaviorTree.SUCCESS
         else:
             self.speed = 0
@@ -85,23 +66,11 @@ class Zombie:
 
     def move_to_player(self):
         self.speed = RUN_SPEED_PPS
-        self.dir = math.atan2(server.boy.y - self.y, server.boy.x - self.x)
-        return BehaviorTree.SUCCESS
-
-    def get_next_position(self):
-        self.target_x, self.target_y = self.patrol_positions[self.patrol_order % len(self.patrol_positions)]
-        self.patrol_order += 1
-        self.dir = math.atan2(self.target_y - self.y, self.target_x - self.x)
-        return BehaviorTree.SUCCESS
-
-    def move_to_target(self):
-        self.speed = RUN_SPEED_PPS
-        distance = (self.target_x - self.x) ** 2 + (self.target_y - self.y) ** 2
-        if distance < PIXEL_PER_METER ** 2:
-            return BehaviorTree.SUCCESS
+        if server.character.x - self.x >= 0:
+            self.dir = 1
         else:
-            return BehaviorTree.RUNNING
-
+            self.dir = -1
+        return BehaviorTree.SUCCESS
 
 
     def build_behavior_tree(self):
@@ -111,36 +80,30 @@ class Zombie:
         chase_node = SequenceNode("Chase")
         chase_node.add_children(find_player_node, move_to_player_node)
         wander_chase_node = SelectorNode("WanderChase")
-        wander_chase_node.add_children(chase_node, wander_node)
+        wander_chase_node.add_children(wander_node, chase_node)
         self.bt = BehaviorTree(wander_chase_node)
 
 
 
 
     def get_bb(self):
-        return self.x - 50, self.y - 50, self.x + 50, self.y + 50
+        return self.cx - 25, self.y - 25, self.cx + 25, self.y + 25
 
     def update(self):
+        self.cx = self.x - server.stage.window_left
         self.bt.run()
-        self.frame = (self.frame +
-                      FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % FRAMES_PER_ACTION
-        self.x += self.speed * math.cos(self.dir) * game_framework.frame_time
-        self.y += self.speed * math.sin(self.dir) * game_framework.frame_time
-        self.x = clamp(50, self.x, 1280 - 50)
-        self.y = clamp(50, self.y, 1024 - 50)
+        self.frame = (self.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 2
+        self.x += self.speed * self.dir * game_framework.frame_time
 
 
     def draw(self):
-        if math.cos(self.dir) < 0:
-            if self.speed == 0:
-                Zombie.images['Idle'][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 100, 100)
-            else:
-                Zombie.images['Walk'][int(self.frame)].composite_draw(0, 'h', self.x, self.y, 100, 100)
+        if self.dir != 0:
+            self.image.clip_draw(int(self.frame) * 60, 480, 60, 60, self.cx, self.y)
         else:
-            if self.speed == 0:
-                Zombie.images['Idle'][int(self.frame)].draw(self.x, self.y, 100, 100)
-            else:
-                Zombie.images['Walk'][int(self.frame)].draw(self.x, self.y, 100, 100)
+            self.image.clip_draw(120, 480, 60, 60, self.cx, self.y - 10)
+        draw_rectangle(*self.get_bb())
+        #self.font.draw(cx - 60, self.y + 50, '(x: %3.2f)' % cx, (255, 255, 0))
+        #self.font.draw(cx - 60, self.y + 75, '(cx: %3.2f)' % cx, (255, 255, 0))
 
     def handle_event(self, event):
         pass
