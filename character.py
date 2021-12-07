@@ -222,7 +222,7 @@ next_state_table = {
 class Character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
-        self.x, self.y = 300, 88
+        self.x, self.y = 300, 110
         self.j = -10
         self.frame = 0
         self.dir = 1
