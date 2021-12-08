@@ -70,16 +70,16 @@ class Goal:
             self.cx, self.y = self.x, self.y
 
         def get_bb(self):
-            return self.cx - 30, self.y - 50, self.cx + 30, self.y + 50
+            return self.cx - 20, self.y - 50, self.cx + 20, self.y + 50
 
         def update(self):
             self.cx = self.x - server.stage.window_left
 
         def draw(self):
             self.image.draw(self.cx, self.y, 100, 100)
-            # draw_rectangle(*self.get_bb())
+            draw_rectangle(*self.get_bb())
 
-tilepos = [600, 3600, 4800]
+tilepos = [1700, 3600, 4800]
 
 class Tile:
     def __init__(self, i):

@@ -44,12 +44,12 @@ class SmallIdleState:
                 character.j = -character.j
         elif event == SPACE_DOWN:
             character.j = 10
-        elif event == DAMAGE:
-            character.frame = 5
-            character.j = 10
+
 
     def exit(character, event):
-        pass
+        if event == DAMAGE:
+            character.frame = 5
+            character.j = 10
 
     def do(character):
         if character.j > 0:
@@ -61,6 +61,7 @@ class SmallIdleState:
         elif character.j == -11 or character.frame == 5:
             character.y += character.j
         else:
+            character.y += character.j
             character.j = -10
     def draw(character):
         if character.frame == 5:
@@ -93,7 +94,9 @@ class SmallRunState:
         character.dir = clamp(-1, character.velocity, 1)
 
     def exit(character, event):
-        pass
+        if event == DAMAGE:
+            character.frame = 5
+            character.j = 10
 
     def do(character):
         character.frame = (character.frame + FRAMES_PER_ACTION * ACTION_PER_TIME * game_framework.frame_time) % 3
@@ -107,6 +110,7 @@ class SmallRunState:
         elif character.j == -11 or character.frame == 5:
             character.y += character.j
         else:
+            character.y += character.j
             character.j = -10
         character.x = clamp(25, character.x, 5952 - 25)
         #character.y = clamp(90, character.y, server.stage.h - 90)
@@ -150,7 +154,10 @@ class BigIdleState:
         elif character.j <= 0 and character.j > -10:
             character.j -= 0.2
             character.y += character.j
+        elif character.j == -11 or character.frame == 5:
+            character.y += character.j
         else:
+            character.y += character.j
             character.j = -10
 
     def draw(character):
@@ -193,7 +200,10 @@ class BigRunState:
         elif character.j <= 0 and character.j > -10:
             character.j -= 0.2
             character.y += character.j
+        elif character.j == -11 or character.frame == 5:
+            character.y += character.j
         else:
+            character.y += character.j
             character.j = -10
         character.x = clamp(25, character.x, 5952 - 25)
         #character.y = clamp(90, character.y, server.background.h - 90)
@@ -224,18 +234,18 @@ class Character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
         self.font = load_font('ENCR10B.TTF', 16)
-        self.x, self.y = 300, 110
-        self.cx, self.y = 300, 110
+        self.x, self.y = 300, 120
+        self.cx, self.cy = self.x, self.y
         self.j = -10
         self.frame = 0
         self.dir = 1
         self.velocity = 0
         self.event_que = []
-        self.cur_state = SmallIdleState
+        self.cur_state = BigIdleState
         self.cur_state.enter(self, None)
 
     def get_bb(self):
-        return self.cx - 25, self.y - 35, self.cx + 25, self.y + 35
+        return self.cx - 18, self.y - 35, self.cx + 18, self.y + 35
 
 
     def fire_ball(self):
@@ -248,7 +258,8 @@ class Character:
 
     def update(self):
         self.cx, self.cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
-        if self.j == -10: self.y = clamp(110, self.y, server.stage.h - 110)
+        if self.j == -10:
+            self.y = clamp(120, self.y, server.stage.h - 120)
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()

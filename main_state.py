@@ -36,6 +36,8 @@ def enter():
     game_world.add_objects(server.holes, 1)
     server.tiles = [Tile(i) for i in range(3)]
     game_world.add_objects(server.tiles, 1)
+    server.blocks = [Block(i) for i in range(5)]
+    game_world.add_objects(server.blocks, 1)
     server.goal = Goal()
     game_world.add_object(server.goal, 1)
     server.character = Character()
@@ -77,11 +79,21 @@ def update():
                 server.enemies.remove(enemy)
                 game_world.remove_object(enemy)
             else:
-                enemy.dir = 0
+                if enemy.x > server.character.x:
+                    server.character.x -= RUN_SPEED_PPS * game_framework.frame_time * 20
+                else:
+                    server.character.x += RUN_SPEED_PPS * game_framework.frame_time * 20
                 server.character.add_event(DAMAGE)
+                server.character.y = clamp(120, server.character.y, 150)
         for hole in server.holes:
             if collide(hole, enemy):
                 enemy.y -= 10
+        for tile in server.tiles:
+            if collide(tile, enemy):
+                if tile.x > enemy.x:
+                    enemy.x -= RUN_SPEED_PPS * game_framework.frame_time
+                else:
+                    enemy.x += RUN_SPEED_PPS * game_framework.frame_time
 
     for hole in server.holes:
         if server.character.j == 0 and collide(server.character, hole):
@@ -94,10 +106,25 @@ def update():
     for tile in server.tiles:
         if collide(server.character, tile):
             if server.character.y >= tile.y + 40:
-                server.character.y += 2
+                server.character.y = tile.y + 75
             else:
-                server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
+                if tile.x > server.character.x:
+                    server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
+                else:
+                    server.character.x += RUN_SPEED_PPS * game_framework.frame_time
 
+    for block in server.blocks:
+        if collide(server.character, block):
+            if server.character.y >= block.y + 20:
+                server.character.y = block.y + 55
+            else:
+                if block.x > server.character.x and block.y <= server.character.y:
+                    server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
+                elif block.x < server.character.x and block.y <= server.character.y:
+                    server.character.x += RUN_SPEED_PPS * game_framework.frame_time
+                else:
+                    server.blocks.remove(block)
+                    game_world.remove_object(block)
 
 
 def draw():
