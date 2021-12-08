@@ -6,3 +6,4 @@ items = []
 blocks = []
 holes = []
 goal = None
+tiles = []

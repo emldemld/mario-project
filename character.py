@@ -6,7 +6,7 @@ from object import Ball
 
 # Run Speed
 PIXEL_PER_METER = (10.0 / 0.3)  # 10 pixel 30 cm
-RUN_SPEED_KMPH = 20.0  # Km / Hour
+RUN_SPEED_KMPH = 25.0  # Km / Hour
 RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
 RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
 RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
@@ -248,7 +248,7 @@ class Character:
 
     def update(self):
         self.cx, self.cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
-        #if self.j == -10: self.y = clamp(110, self.y, server.stage.h - 110)
+        if self.j == -10: self.y = clamp(110, self.y, server.stage.h - 110)
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()

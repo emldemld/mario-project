@@ -34,6 +34,8 @@ def enter():
     game_world.add_objects(server.enemies, 1)
     server.holes = [Hole(i) for i in range(3)]
     game_world.add_objects(server.holes, 1)
+    server.tiles = [Tile(i) for i in range(3)]
+    game_world.add_objects(server.tiles, 1)
     server.goal = Goal()
     game_world.add_object(server.goal, 1)
     server.character = Character()
@@ -82,12 +84,19 @@ def update():
                 enemy.y -= 10
 
     for hole in server.holes:
-        if server.character.j == 1-1 and collide(server.character, hole):
+        if server.character.j == 0 and collide(server.character, hole):
             server.character.y -= server.character.j
         elif server.character.j != -11 and collide(server.character, hole):
             if server.character.x > hole.x - 50 and server.character.x < hole.x + 50:
                 server.character.j = -11
                 server.character.y -= server.character.j
+
+    for tile in server.tiles:
+        if collide(server.character, tile):
+            if server.character.y >= tile.y + 40:
+                server.character.y += 2
+            else:
+                server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
 
 
 
