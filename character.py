@@ -142,8 +142,8 @@ class BigIdleState:
                 character.j = -character.j
         elif event == SPACE_DOWN:
             character.j = 10
-        elif event == DAMAGE:
-            pass
+        elif event == SHIFT:
+            character.fire_ball()
         character.size = 35
 
     def exit(character, event):
@@ -188,6 +188,8 @@ class BigRunState:
                 character.j = -character.j
         elif event == SPACE_DOWN:
             character.j = 10
+        elif event == SHIFT:
+            character.fire_ball()
         character.dir = clamp(-1, character.velocity, 1)
         character.size = 35
 
@@ -236,7 +238,7 @@ next_state_table = {
 class Character:
     def __init__(self):
         self.image = load_image('smb_mario.png')
-        self.font = load_font('ENCR10B.TTF', 16)
+        self.font = load_font('ENCR10B.TTF', 30)
         self.x, self.y = 300, 120
         self.cx, self.cy = self.x, self.y
         self.j, self.size = -10, 15
@@ -248,12 +250,12 @@ class Character:
         self.cur_state.enter(self, None)
 
     def get_bb(self):
-        return self.cx - 18, self.y - 35, self.cx + 18, self.y + self.size
+        return self.cx - 15, self.y - 35, self.cx + 15, self.y + self.size
 
 
     def fire_ball(self):
-        server.ball = Ball(self.x, self.y, self.dir * RUN_SPEED_PPS * 10)
-        game_world.add_object(server.ball, 1)
+        ball = Ball(self.x, self.y, self.dir * RUN_SPEED_PPS * 10)
+        server.balls.append(ball)
 
 
     def add_event(self, event):
@@ -273,7 +275,7 @@ class Character:
     def draw(self):
         self.cur_state.draw(self)
         draw_rectangle(*self.get_bb())
-        self.font.draw(self.cx - 60, self.y + 50, '(x: %3.2f)' % self.x, (255, 255, 0))
+        #self.font.draw(self.cx + 60, server.stage.h - 60, '(x: %3.2f)' % self.x, (255, 255, 0))
         #self.font.draw(self.cx - 60, self.y + 75, '(cx: %3.2f)' % self.cx, (255, 255, 0))
 
 

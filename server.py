@@ -5,6 +5,7 @@ balls = []
 mushroom = None
 blocks = []
 iblocks = []
+coins = []
 holes = []
 goal = None
 tiles = []

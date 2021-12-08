@@ -36,11 +36,13 @@ def enter():
     game_world.add_objects(server.holes, 1)
     server.tiles = [Tile(i) for i in range(3)]
     game_world.add_objects(server.tiles, 1)
-    server.blocks = [Block(i) for i in range(5)]
+    server.blocks = [Block(i) for i in range(33)]
     game_world.add_objects(server.blocks, 1)
     server.mushroom = Mushroom()
     game_world.add_object(server.mushroom, 1)
-    server.iblocks = [IBlock(i) for i in range(1)]
+    server.coins = [Coin(i) for i in range(6)]
+    game_world.add_objects(server.coins, 1)
+    server.iblocks = [IBlock(i) for i in range(7)]
     game_world.add_objects(server.iblocks, 1)
     server.goal = Goal()
     game_world.add_object(server.goal, 1)
@@ -130,6 +132,19 @@ def update():
                     server.blocks.remove(block)
                     game_world.remove_object(block)
 
+    if collide(server.character, server.iblocks[0]):
+        if server.character.y >= server.iblocks[0].y + 20:
+            server.character.y = server.iblocks[0].y + 55
+        else:
+            if server.iblocks[0].x - 20 > server.character.x and server.iblocks[0].y <= server.character.y:
+                server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
+            elif server.iblocks[0].x + 20 < server.character.x and server.iblocks[0].y <= server.character.y:
+                server.character.x += RUN_SPEED_PPS * game_framework.frame_time
+            else:
+                server.character.j = -server.character.j
+                server.mushroom.y = 440
+
+    i = 0;
     for iblock in server.iblocks:
         if collide(server.character, iblock):
             if server.character.y >= iblock.y + 20:
@@ -141,7 +156,16 @@ def update():
                     server.character.x += RUN_SPEED_PPS * game_framework.frame_time
                 else:
                     server.character.j = -server.character.j
-                    server.mushroom.y = 440
+                    server.coins[i - 1].y = iblock.y + 40
+        i += 1
+
+    for coin in server.coins:
+        if collide(server.character, coin):
+            if coin.count == 0:
+                server.stage.coin += 1
+                coin.count = 1
+            game_world.remove_object(coin)
+
 
     if collide(server.character, server.mushroom):
         game_world.remove_object(server.mushroom)
