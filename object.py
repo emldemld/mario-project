@@ -2,15 +2,20 @@ from pico2d import *
 import game_world
 import server
 
-class Item:
-    def __init__(self, m, n): #생성자
+class Mushroom:
+    def __init__(self): #생성자
         self.image = load_image('smb_items_sheet.png')
-        self.x, self.y = 300, 80
-        self.m, self.n = m, n
+        self.x, self.y = 900, 405
+        self.cx, self.y = self.x, self.y
+
+    def get_bb(self):
+        return self.cx - 20, self.y - 20, self.cx + 20, self.y + 20
+
     def update(self):
-        pass
+        self.cx = self.x - server.stage.window_left
+
     def draw(self):
-        self.image.clip_draw(self.m * 60, self.n * 60, 60, 60, self.x, self.y)
+        self.image.clip_draw(360, 120, 60, 60, self.cx, self.y)
 
 blockpos = [(820, 200), (860, 200), (900, 200), (940, 200), (980, 200)]
 
@@ -29,6 +34,25 @@ class Block:
 
     def draw(self):
         self.image.clip_draw(0, 40, 40, 40, self.cx, self.y)
+        draw_rectangle(*self.get_bb())
+
+iblockpos = [(900, 400)]
+
+class IBlock:
+    def __init__(self, i):
+        self.image = load_image('block.png')
+        self.font = load_font('ENCR10B.TTF', 16)
+        self.x, self.y = iblockpos[i]
+        self.cx, self.y = self.x, self.y
+
+    def get_bb(self):
+        return self.cx - 20, self.y - 20, self.cx + 20, self.y + 20
+
+    def update(self):
+        self.cx = self.x - server.stage.window_left
+
+    def draw(self):
+        self.image.clip_draw(0, 0, 40, 40, self.cx, self.y)
         draw_rectangle(*self.get_bb())
 
 class Ball:

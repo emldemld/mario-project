@@ -44,7 +44,7 @@ class SmallIdleState:
                 character.j = -character.j
         elif event == SPACE_DOWN:
             character.j = 10
-
+        character.size = 15
 
     def exit(character, event):
         if event == DAMAGE:
@@ -92,6 +92,7 @@ class SmallRunState:
         elif event == SPACE_DOWN:
             character.j = 10
         character.dir = clamp(-1, character.velocity, 1)
+        character.size = 15
 
     def exit(character, event):
         if event == DAMAGE:
@@ -143,6 +144,7 @@ class BigIdleState:
             character.j = 10
         elif event == DAMAGE:
             pass
+        character.size = 35
 
     def exit(character, event):
         pass
@@ -187,6 +189,7 @@ class BigRunState:
         elif event == SPACE_DOWN:
             character.j = 10
         character.dir = clamp(-1, character.velocity, 1)
+        character.size = 35
 
     def exit(character, event):
         pass
@@ -236,16 +239,16 @@ class Character:
         self.font = load_font('ENCR10B.TTF', 16)
         self.x, self.y = 300, 120
         self.cx, self.cy = self.x, self.y
-        self.j = -10
+        self.j, self.size = -10, 15
         self.frame = 0
         self.dir = 1
         self.velocity = 0
         self.event_que = []
-        self.cur_state = BigIdleState
+        self.cur_state = SmallIdleState
         self.cur_state.enter(self, None)
 
     def get_bb(self):
-        return self.cx - 18, self.y - 35, self.cx + 18, self.y + 35
+        return self.cx - 18, self.y - 35, self.cx + 18, self.y + self.size
 
 
     def fire_ball(self):

@@ -38,6 +38,10 @@ def enter():
     game_world.add_objects(server.tiles, 1)
     server.blocks = [Block(i) for i in range(5)]
     game_world.add_objects(server.blocks, 1)
+    server.mushroom = Mushroom()
+    game_world.add_object(server.mushroom, 1)
+    server.iblocks = [IBlock(i) for i in range(1)]
+    game_world.add_objects(server.iblocks, 1)
     server.goal = Goal()
     game_world.add_object(server.goal, 1)
     server.character = Character()
@@ -125,6 +129,24 @@ def update():
                 else:
                     server.blocks.remove(block)
                     game_world.remove_object(block)
+
+    for iblock in server.iblocks:
+        if collide(server.character, iblock):
+            if server.character.y >= iblock.y + 20:
+                server.character.y = iblock.y + 55
+            else:
+                if iblock.x - 20 > server.character.x and iblock.y <= server.character.y:
+                    server.character.x -= RUN_SPEED_PPS * game_framework.frame_time
+                elif iblock.x + 20 < server.character.x and iblock.y <= server.character.y:
+                    server.character.x += RUN_SPEED_PPS * game_framework.frame_time
+                else:
+                    server.character.j = -server.character.j
+                    server.mushroom.y = 440
+
+    if collide(server.character, server.mushroom):
+        game_world.remove_object(server.mushroom)
+        server.character.add_event(MUSHROOM)
+
 
 
 def draw():
