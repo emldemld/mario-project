@@ -17,11 +17,12 @@ TIME_PER_ACTION = 0.5
 ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
 FRAMES_PER_ACTION = 10
 
+positions = [1000, 1800, 2600, 3600, 4200, 5000]
 
 class Enemy:
 
-    def __init__(self):
-        self.x, self.y = random.randint(500, 5500), 95
+    def __init__(self, i):
+        self.x, self.y = positions[i], 95
         self.cx, self.cy = self.x, self.y
         self.image = load_image('enemies.png')
         self.font = load_font('ENCR10B.TTF', 16)
@@ -60,7 +61,6 @@ class Enemy:
         if distance < (PIXEL_PER_METER * 14) ** 2:
             return BehaviorTree.SUCCESS
         else:
-            self.speed = 0
             return BehaviorTree.FAIL
 
 
@@ -102,7 +102,7 @@ class Enemy:
         else:
             self.image.clip_draw(120, 480, 60, 60, self.cx, self.y - 10)
         draw_rectangle(*self.get_bb())
-        #self.font.draw(cx - 60, self.y + 50, '(x: %3.2f)' % cx, (255, 255, 0))
+        #self.font.draw(self.cx - 60, self.y + 50, '(x: %3.2f)' % self.x, (255, 255, 0))
         #self.font.draw(cx - 60, self.y + 75, '(cx: %3.2f)' % cx, (255, 255, 0))
 
     def handle_event(self, event):

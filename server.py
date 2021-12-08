@@ -4,3 +4,5 @@ enemies = []
 balls = []
 items = []
 blocks = []
+holes = []
+goal = None

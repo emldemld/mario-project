@@ -54,11 +54,11 @@ class SmallIdleState:
     def do(character):
         if character.j > 0:
             character.y += character.j
-            character.j -= 0.25
+            character.j -= 0.2
         elif character.j <= 0 and character.j > -10:
-            character.j -= 0.25
+            character.j -= 0.2
             character.y += character.j
-        elif character.j <= -10 and character.frame == 5:
+        elif character.j == -11 or character.frame == 5:
             character.y += character.j
         else:
             character.j = -10
@@ -100,9 +100,11 @@ class SmallRunState:
         character.x += character.velocity * game_framework.frame_time
         if character.j > 0:
             character.y += character.j
-            character.j -= 0.25
+            character.j -= 0.2
         elif character.j <= 0 and character.j > -10:
-            character.j -= 0.25
+            character.j -= 0.2
+            character.y += character.j
+        elif character.j == -11 or character.frame == 5:
             character.y += character.j
         else:
             character.j = -10
@@ -144,24 +146,22 @@ class BigIdleState:
     def do(character):
         if character.j > 0:
             character.y += character.j
-            character.j -= 0.25
+            character.j -= 0.2
         elif character.j <= 0 and character.j > -10:
-            character.j -= 0.25
+            character.j -= 0.2
             character.y += character.j
         else:
             character.j = -10
 
     def draw(character):
-        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
-
         if character.j > -10 and character.dir == 1:
-            character.image.clip_draw(720, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(720, 3 * 66, 64, 66, character.cx, character.cy)
         elif character.j > -10 and character.dir == -1:
-            character.image.clip_draw(60, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(60, 3 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == 1:
-            character.image.clip_draw(420, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(420, 3 * 66, 64, 66, character.cx, character.cy)
         else:
-            character.image.clip_draw(360, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(360, 3 * 66, 64, 66, character.cx, character.cy)
 
 
 class BigRunState:
@@ -189,9 +189,9 @@ class BigRunState:
         character.x += character.velocity * game_framework.frame_time
         if character.j > 0:
             character.y += character.j
-            character.j -= 0.25
+            character.j -= 0.2
         elif character.j <= 0 and character.j > -10:
-            character.j -= 0.25
+            character.j -= 0.2
             character.y += character.j
         else:
             character.j = -10
@@ -199,16 +199,15 @@ class BigRunState:
         #character.y = clamp(90, character.y, server.background.h - 90)
 
     def draw(character):
-        cx, cy = character.x - server.stage.window_left, character.y - server.stage.window_bottom
 
         if character.j > -10 and character.dir == 1:
-            character.image.clip_draw(720, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(720, 3 * 66, 64, 66, character.cx, character.cy)
         elif character.j > -10 and character.dir == -1:
-            character.image.clip_draw(60, 3 * 66, 64, 66, cx, cy)
+            character.image.clip_draw(60, 3 * 66, 64, 66, character.cx, character.cy)
         elif character.j == -10 and character.dir == 1:
-            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 3, 64, 66, cx, cy)
+            character.image.clip_draw(int(character.frame) * 60 + 480, 66 * 3, 64, 66, character.cx, character.cy)
         else:
-            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 3, 64, 66, cx, cy)
+            character.image.clip_draw(int(character.frame) * -60 + 300, 66 * 3, 64, 66, character.cx, character.cy)
 
 next_state_table = {
     SmallIdleState: {RIGHT_UP: SmallRunState, LEFT_UP: SmallRunState, RIGHT_DOWN: SmallRunState, LEFT_DOWN: SmallRunState,
@@ -249,6 +248,7 @@ class Character:
 
     def update(self):
         self.cx, self.cy = self.x - server.stage.window_left, self.y - server.stage.window_bottom
+        #if self.j == -10: self.y = clamp(110, self.y, server.stage.h - 110)
         self.cur_state.do(self)
         if len(self.event_que) > 0:
             event = self.event_que.pop()
@@ -259,7 +259,7 @@ class Character:
     def draw(self):
         self.cur_state.draw(self)
         draw_rectangle(*self.get_bb())
-        #self.font.draw(self.cx - 60, self.y + 50, '(x: %3.2f)' % self.x, (255, 255, 0))
+        self.font.draw(self.cx - 60, self.y + 50, '(x: %3.2f)' % self.x, (255, 255, 0))
         #self.font.draw(self.cx - 60, self.y + 75, '(cx: %3.2f)' % self.cx, (255, 255, 0))
 
 

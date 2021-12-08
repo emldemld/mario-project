@@ -13,6 +13,7 @@ from object import *
 from enemy import Enemy
 import server
 import game_over_state
+import clear_state
 
 name = "MainState"
 
@@ -27,12 +28,16 @@ def collide(a, b):
     return True
 
 def enter():
-    server.character = Character()
-    game_world.add_object(server.character, 1)
     server.stage = Background()
     game_world.add_object(server.stage, 0)
-    server.enemies = [Enemy() for i in range(6)]
+    server.enemies = [Enemy(i) for i in range(6)]
     game_world.add_objects(server.enemies, 1)
+    server.holes = [Hole(i) for i in range(3)]
+    game_world.add_objects(server.holes, 1)
+    server.goal = Goal()
+    game_world.add_object(server.goal, 1)
+    server.character = Character()
+    game_world.add_object(server.character, 1)
 
 def exit():
     game_world.clear()
@@ -58,8 +63,11 @@ def handle_events():
 def update():
     if server.character.y < 0:
         game_framework.change_state(game_over_state)
+    if collide(server.character, server.goal):
+        game_framework.change_state(clear_state)
     for game_object in game_world.all_objects():
         game_object.update()
+
     for enemy in server.enemies:
         if collide(server.character, enemy):
             if server.character.y - enemy.y > 25 and enemy.dir != 0:
@@ -69,6 +77,17 @@ def update():
             else:
                 enemy.dir = 0
                 server.character.add_event(DAMAGE)
+        for hole in server.holes:
+            if collide(hole, enemy):
+                enemy.y -= 10
+
+    for hole in server.holes:
+        if server.character.j == 1-1 and collide(server.character, hole):
+            server.character.y -= server.character.j
+        elif server.character.j != -11 and collide(server.character, hole):
+            if server.character.x > hole.x - 50 and server.character.x < hole.x + 50:
+                server.character.j = -11
+                server.character.y -= server.character.j
 
 
 
