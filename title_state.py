@@ -4,16 +4,25 @@ import main_state
 
 name = "TitleState"
 image = None
+bgm = None
+
+class Bgm:
+    def __init__(self):
+        self.bgm = load_music('01 - Super Mario Bros.mp3')
+        self.bgm.set_volume(64)
+        self.bgm.repeat_play()
 
 
 def enter():
-    global image
+    global image, bgm
     image = load_image('img.png')
+    bgm = Bgm()
 
 
 def exit():
-    global image
+    global image, bgm
     del (image)
+    del bgm
 
 
 def handle_events():

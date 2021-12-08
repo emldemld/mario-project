@@ -5,6 +5,9 @@ class Background:
 
     def __init__(self):
         self.image = load_image('overworld_bg.png')
+        self.bgm = load_music('03 - Hurry - Super Mario Bros.mp3')
+        self.bgm.set_volume(64)
+        self.bgm.repeat_play()
         self.canvas_width = get_canvas_width()
         self.canvas_height = get_canvas_height()
         self.font = load_font('ENCR10B.TTF', 32)

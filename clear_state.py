@@ -4,16 +4,24 @@ import main_state
 
 name = "ClearState"
 image = None
+bgm = None
 
+class Bgm:
+    def __init__(self):
+        self.bgm = load_music('04 - Area Clear.mp3')
+        self.bgm.set_volume(64)
+        self.bgm.repeat_play()
 
 def enter():
-    global image
+    global image, bgm
     image = load_image('clear.png')
+    bgm = Bgm()
 
 
 def exit():
-    global image
+    global image, bgm
     del (image)
+    del bgm
 
 
 def handle_events():
@@ -29,7 +37,6 @@ def draw():
     clear_canvas()
     image.draw(500, 275)
     update_canvas()
-
 
 
 
